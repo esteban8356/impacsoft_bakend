@@ -83,11 +83,12 @@ exports.login = async (req, res) => {
             const roleData = await Role.findByPk(user.role);
             const allowedModules = roleData ? roleData.modules : [];
 
-            // Set HttpOnly cookie
+            // Set HttpOnly cookie - support cross-site cookies in production/HTTPS
+            const isProduction = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
             res.cookie('token', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // true in production
-                sameSite: 'lax', // Lax is better for development/navigational flows than Strict
+                secure: isProduction,
+                sameSite: isProduction ? 'none' : 'lax',
                 maxAge: 2 * 60 * 60 * 1000 // 2 hours
             });
 
@@ -101,7 +102,12 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    res.clearCookie('token');
+    const isProduction = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax'
+    });
     res.status(200).send('Logged out successfully');
 };
 

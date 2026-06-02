@@ -11,13 +11,29 @@ const app = express();
 app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
-// Update CORS to allow credentials
+// Update CORS to allow credentials and dynamic origins
+const allowedOrigins = [
+    'http://localhost:4200',
+    process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-    origin: 'http://localhost:4200',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+        if (!origin) return callback(null, true);
+        
+        // Allow if in allowedOrigins or if it is a subdomain of sslip.io
+        if (allowedOrigins.includes(origin) || origin.endsWith('.sslip.io')) {
+            return callback(null, true);
+        }
+        
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token']
 }));
+
 
 // Security Middleware
 app.use(helmet());

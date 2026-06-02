@@ -13,8 +13,17 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:3000/api',
+                url: '/api',
+                description: 'Servidor Actual (Ruta Relativa)'
             },
+            {
+                url: 'http://localhost:3000/api',
+                description: 'Servidor Local'
+            },
+            {
+                url: 'https://organizacion-bakend-3yl9vj-87dc47-187-77-195-31.sslip.io/api',
+                description: 'Servidor Desplegado'
+            }
         ],
         components: {
             securitySchemes: {
