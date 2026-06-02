@@ -8,6 +8,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
 // Update CORS to allow credentials
@@ -55,7 +56,7 @@ console.log('Swagger loaded');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.get('/', (req, res) => {
-    res.send('Backend API is running. Go to <a href="/api-docs">/api-docs</a> for documentation.');
+    res.send('Backend API is running. Go to <a href="/api-docs/">/api-docs/</a> for documentation.');
 });
 
 // Global Error Handler
